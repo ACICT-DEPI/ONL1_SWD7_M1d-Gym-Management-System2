@@ -29,24 +29,32 @@ public class TraineeController {
     }
 
     @GetMapping("/trainees/{id}")  // Maps to root URL
-    public String getTrainee(@PathVariable Long id) {
-        return "Fetching Trainee at id = " + id;
+    public Trainee getTrainee(@PathVariable Integer id) {
+        return traineeService.getTrainee(id);
     }
 
     @PostMapping("/trainees")
     public Trainee saveTrainee(@RequestBody Trainee trainee) {
-
         return traineeService.saveTrainee(trainee);
     }
     
     @PutMapping("/trainees/{id}")
-    public Trainee putMethodName(@PathVariable Long id, @RequestBody Trainee trainee) {
-        System.out.println("Updating the Trainee data at id = " + id);        
-        return trainee;
+    public Trainee editTrainee(@PathVariable Integer id, @RequestBody Trainee trainee) {
+        trainee.setId(id);        
+        return traineeService.editTrainee(trainee);
     }
 
     @DeleteMapping("/trainees")
-    public String deleteTrainee(@RequestParam Long id){
-        return "Deleting Trainee at id = " + id;
+    public void deleteTrainee(@RequestParam(required = false) Integer id, @RequestParam(required = false) String ssr){
+        if(id != null){
+            traineeService.deleteTrainee(id);
+        }
+        else if(ssr != null){
+            traineeService.deleteTrainee(ssr);
+        }
+        else{
+            System.out.println("Either 'id' or 'name' must be provided.");
+        }
     }
+
 }

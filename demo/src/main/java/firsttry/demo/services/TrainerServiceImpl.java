@@ -1,6 +1,7 @@
 package firsttry.demo.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -59,6 +60,54 @@ public class TrainerServiceImpl implements TrainerService{
             else{
                 System.out.println("Trainer already exists");
                 return trainers.get(0);
+            }
+        }
+    }
+
+    @Override
+    public void deleteTrainer(Object pram) {
+        if(pram instanceof Integer){
+            Optional<Trainer> trainers = trainerRepository.findById((Integer)pram);
+            if(trainers.isPresent()){
+                trainerRepository.deleteById((Integer)pram);
+            }
+            else{
+                System.out.println("No Such Trainer to be deleted");
+            }
+        }
+        else if(pram instanceof String){
+            List<Person> persons = personRepository.findBySsr((String)pram);
+            if(persons.isEmpty()){
+                System.out.println("No Such Trainer to be deleted");
+            }
+            else{
+                List<Trainer> trainers = trainerRepository.findByPerson(persons.get(0));
+                trainerRepository.deleteById(trainers.get(0).getId());
+            }
+        }
+    }
+
+    @Override
+    public Trainer getTrainer(int id) {
+        return trainerRepository.findById(id).get(0);
+    }
+
+    @Override
+    public Trainer editTrainer(Trainer trainer) {
+        List<Trainer> trainers = trainerRepository.findByPerson(trainer.getPerson());
+        List<GymHall> gymHalls = gymHallRepository.findByGymHallName(trainer.getGymHall().getGymHallName());
+        if(trainers.isEmpty()){
+            System.out.println("No such Trainer to be updated.");
+            return trainer;
+        }
+        else{
+            if(gymHalls.isEmpty()){
+                System.out.println("No such Gym Hall");
+                return trainer;
+            }
+            else{
+                trainer.setGymHall(gymHalls.get(0));
+                return trainerRepository.save(trainer);
             }
         }
     }
